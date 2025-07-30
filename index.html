@@ -13,7 +13,7 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            justify-content: center; /* 居中对齐 */
             align-items: center;
             min-height: 100vh;
             /* 脊柱背景元素 */
@@ -31,6 +31,7 @@
             box-shadow: 0 8px 30px rgba(0, 123, 255, 0.15);
             padding: 30px 40px;
             border: 1px solid #dee2e6;
+            box-sizing: border-box;
         }
 
         /* --- 标题和头部 --- */
@@ -47,6 +48,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            margin-top: 0;
+            margin-bottom: 10px;
         }
         .spine-icon {
             width: 30px;
@@ -55,6 +58,28 @@
         header p {
             font-size: 1.1em;
             color: #6c757d;
+            margin-top: 15px;
+        }
+        
+        /* --- 作者信息 --- */
+        .author-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            color: #888;
+        }
+        .author-info img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+        .author-info p {
+            margin: 0;
+            font-size: 0.9em;
+            font-weight: 500;
         }
 
         /* --- 表单和计算器卡片 --- */
@@ -181,6 +206,10 @@
                 <svg class="spine-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C10.3431 2 9 3.34315 9 5V6C9 7.65685 10.3431 9 12 9C13.6569 9 15 7.65685 15 6V5C15 3.34315 13.6569 2 12 2Z" stroke="#0056b3" stroke-width="1.5"/><path d="M12 9C10.3431 9 9 10.3431 9 12V13C9 14.6569 10.3431 16 12 16C13.6569 16 15 14.6569 15 13V12C15 10.3431 13.6569 9 12 9Z" stroke="#0056b3" stroke-width="1.5"/><path d="M12 16C10.3431 16 9 17.3431 9 19V20C9 21.6569 10.3431 23 12 23C13.6569 23 15 21.6569 15 20V19C15 17.3431 13.6569 16 12 16Z" stroke="#0056b3" stroke-width="1.5"/></svg>
                 脊柱侧弯进展风险预测
             </h1>
+            <div class="author-info">
+                <img src="https://kobeben-1364006343.cos.ap-nanjing.myqcloud.com/me.jpg" alt="作者头像黄犇" onerror="this.style.display='none';">
+                <p>黄犇</p>
+            </div>
             <p>本工具基于核心风险因素提供评估，仅供教育参考，不能替代专业医疗诊断。</p>
         </header>
 
@@ -346,4 +375,3 @@
 
 </body>
 </html>
-
