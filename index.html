@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脊柱侧弯进展风险预测</title>
+    <style>
+        /* --- 全局样式 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #f0f8ff; /* 淡蓝色背景 */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* 脊柱背景元素 */
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="400" viewBox="0 0 100 400"%3E%3Cpath d="M 50,0 C 20,100 80,200 50,300 C 20,400 80,500 50,600" fill="none" stroke="rgba(0,123,255,0.05)" stroke-width="10"%3E%3C/path%3E%3C/svg%3E');
+            background-repeat: repeat-y;
+            background-position: 2% center;
+        }
+
+        /* --- 主容器 --- */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 123, 255, 0.15);
+            padding: 30px 40px;
+            border: 1px solid #dee2e6;
+        }
+
+        /* --- 标题和头部 --- */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #0056b3; /* 深蓝色 */
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .spine-icon {
+            width: 30px;
+            height: 30px;
+        }
+        header p {
+            font-size: 1.1em;
+            color: #6c757d;
+        }
+
+        /* --- 表单和计算器卡片 --- */
+        .calculator-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            font-size: 1em;
+            box-sizing: border-box; /* 保证padding不影响宽度 */
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="number"]:focus, select:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        /* --- 按钮 --- */
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        /* --- 结果显示区域 --- */
+        #results-card {
+            display: none; /* 初始隐藏 */
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px dashed #007bff;
+            background-color: #e7f3ff;
+        }
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .risk-level {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .risk-low { color: #155724; background-color: #d4edda; }
+        .risk-moderate { color: #856404; background-color: #fff3cd; }
+        .risk-high { color: #721c24; background-color: #f8d7da; }
+        
+        #intervention-plan h3 {
+            color: #0056b3;
+            border-left: 4px solid #007bff;
+            padding-left: 10px;
+            margin-top: 25px;
+        }
+        #intervention-plan ul {
+            list-style-type: '✔ ';
+            padding-left: 20px;
+        }
+        #intervention-plan li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .disclaimer {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* --- 响应式设计 --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+                background-image: none; /* 手机上隐藏背景 */
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>
+                <svg class="spine-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C10.3431 2 9 3.34315 9 5V6C9 7.65685 10.3431 9 12 9C13.6569 9 15 7.65685 15 6V5C15 3.34315 13.6569 2 12 2Z" stroke="#0056b3" stroke-width="1.5"/><path d="M12 9C10.3431 9 9 10.3431 9 12V13C9 14.6569 10.3431 16 12 16C13.6569 16 15 14.6569 15 13V12C15 10.3431 13.6569 9 12 9Z" stroke="#0056b3" stroke-width="1.5"/><path d="M12 16C10.3431 16 9 17.3431 9 19V20C9 21.6569 10.3431 23 12 23C13.6569 23 15 21.6569 15 20V19C15 17.3431 13.6569 16 12 16Z" stroke="#0056b3" stroke-width="1.5"/></svg>
+                脊柱侧弯进展风险预测
+            </h1>
+            <p>本工具基于核心风险因素提供评估，仅供教育参考，不能替代专业医疗诊断。</p>
+        </header>
+
+        <main>
+            <div class="calculator-card">
+                <form id="scoliosisForm">
+                    <div class="form-group">
+                        <label for="cobbAngle">Cobb 角 (来自X光片, 输入 10-50 度的值)</label>
+                        <input type="number" id="cobbAngle" name="cobbAngle" min="10" max="50" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="risserSign">Risser 征 (评估骨骼成熟度)</label>
+                        <select id="risserSign" name="risserSign" required>
+                            <option value="">-- 请选择 --</option>
+                            <option value="0-1">0-1级 (骨骼非常不成熟，风险高)</option>
+                            <option value="2-3">2-3级 (骨骼发育中，风险中等)</option>
+                            <option value="4-5">4-5级 (骨骼基本/完全成熟，风险低)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">生理年龄</label>
+                        <input type="number" id="age" name="age" min="8" max="20" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">性别</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">-- 请选择 --</option>
+                            <option value="female">女</option>
+                            <option value="male">男</option>
+                        </select>
+                    </div>
+
+                    <button type="submit">开始评估</button>
+                </form>
+            </div>
+
+            <div id="results-card">
+                <h2>评估结果</h2>
+                <div id="risk-level-display" class="risk-level"></div>
+                <div id="intervention-plan"></div>
+                <div class="disclaimer">
+                    <strong>重要声明：</strong> 此结果是基于您提供的数据的概率性预测，不构成最终诊断。所有干预措施都必须在专业医生或物理治疗师的指导下进行。
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('scoliosisForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止表单默认提交行为
+
+            // 1. 获取用户输入
+            const cobbAngle = parseInt(document.getElementById('cobbAngle').value);
+            const risserSign = document.getElementById('risserSign').value;
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+
+            if (isNaN(cobbAngle) || isNaN(age) || !risserSign || !gender) {
+                alert('请填写所有必填项！');
+                return;
+            }
+
+            // 2. 简化的积分计算逻辑
+            let riskScore = 0;
+
+            // Cobb 角评分
+            if (cobbAngle >= 30) {
+                riskScore += 40;
+            } else if (cobbAngle >= 20) {
+                riskScore += 25;
+            } else {
+                riskScore += 10;
+            }
+
+            // Risser 征评分
+            if (risserSign === '0-1') {
+                riskScore += 35;
+            } else if (risserSign === '2-3') {
+                riskScore += 15;
+            } else { // 4-5
+                riskScore += 0;
+            }
+            
+            // 年龄评分 (主要针对青春期高峰)
+            if (age >= 10 && age <= 14) {
+                riskScore += 15;
+            } else if (age < 10) {
+                riskScore += 10;
+            }
+
+            // 性别评分
+            if (gender === 'female') {
+                riskScore += 10;
+            }
+
+            // 3. 根据总分判断风险等级和生成干预策略
+            let riskLevel = '';
+            let riskClass = '';
+            let interventionHTML = '';
+
+            if (riskScore >= 65) {
+                riskLevel = '高风险';
+                riskClass = 'risk-high';
+                interventionHTML = `
+                    <h3>核心策略：积极干预，严密监控</h3>
+                    <ul>
+                        <li><strong>立即就医：</strong> 必须立即咨询脊柱专科医生，进行全面评估。这是最高优先级的任务。</li>
+                        <li><strong>支具治疗：</strong> 极大概率需要佩戴定制化的矫形支具。请与医生深入讨论支具的类型、佩戴时间（通常要求每天20小时以上）和目标。</li>
+                        <li><strong>专业物理治疗：</strong> 强烈建议在专业治疗师指导下进行高强度的脊柱侧弯特异性锻炼，如德国的施罗斯（Schroth）疗法。这可以增强核心肌力，改善姿势，并作为支具治疗的重要补充。</li>
+                        <li><strong>定期复查：</strong> 需要非常频繁地进行复查，通常是每 3-4 个月一次，包括X光片拍摄，以精确追踪侧弯角度的变化。</li>
+                        <li><strong>手术咨询：</strong> 如果Cobb角持续增大，特别是接近或超过45-50度，医生可能会开始与您和家人讨论手术治疗的选项、时机和利弊。</li>
+                        <li><strong>生活管理：</strong> 保持均衡营养，确保钙和维生素D的摄入。避免对脊柱产生高冲击力或不对称负荷的运动。</li>
+                    </ul>
+                `;
+            } else if (riskScore >= 35) {
+                riskLevel = '中度风险';
+                riskClass = 'risk-moderate';
+                interventionHTML = `
+                    <h3>核心策略：主动管理，定期复查</h3>
+                    <ul>
+                        <li><strong>寻求专业评估：</strong> 建议尽快咨询脊柱专科或康复科医生，确认目前状况并制定个性化管理方案。</li>
+                        <li><strong>专业物理治疗：</strong> 这是此阶段的核心。应开始系统性的脊柱侧弯特异性锻炼（如施罗斯疗法），目标是建立正确的身体知觉、增强核心肌群、矫正日常姿势。</li>
+                        <li><strong>支具可能性：</strong> 医生可能会根据您的具体情况（特别是Cobb角在25度以上且骨骼未成熟）建议佩戴支具，以预防侧弯进一步发展。</li>
+                        <li><strong>定期复查：</strong> 通常建议每 4-6 个月进行一次临床和X光复查，密切监控侧弯变化。</li>
+                        <li><strong>姿势教育：</strong> 学习并在日常生活中（坐、站、走、学习）保持正确的姿势至关重要。</li>
+                        <li><strong>适当运动：</strong> 可进行游泳（特别是蛙泳和仰泳）、普拉提、瑜伽（需避免过度扭转）等对称性运动，增强整体肌肉平衡。</li>
+                    </ul>
+                `;
+            } else {
+                riskLevel = '低风险';
+                riskClass = 'risk-low';
+                interventionHTML = `
+                    <h3>核心策略：观察为主，健康生活</h3>
+                    <ul>
+                        <li><strong>定期观察与随访：</strong> 虽然当前风险较低，但仍需保持警惕。建议每年进行一次脊柱专科的常规检查，直到骨骼发育成熟。</li>
+                        <li><strong>姿势纠正与教育：</strong> 关注并改善日常学习、工作和生活中的不良姿势，如长时间低头、跷二郎腿、单肩背包等。</li>
+                        <li><strong>加强核心锻炼：</strong> 进行如平板支撑、小燕飞、桥式等核心肌群训练，增强脊柱的稳定性。</li>
+                        <li><strong>均衡对称运动：</strong> 推荐进行游泳、慢跑、单杠悬吊等对称性体育活动，促进身体平衡发展。避免单侧发力的运动（如羽毛球、乒乓球），或在运动后进行充分的拉伸。</li>
+                        <li><strong>保持健康生活方式：</strong> 保证充足的睡眠、均衡的营养，特别是钙质的摄入，为骨骼健康打下良好基础。</li>
+                        <li><strong>自我检查：</strong> 家长可以定期（如每3个月）通过亚当测试（Adam's Forward Bend Test）观察孩子背部是否有不对称隆起。</li>
+                    </ul>
+                `;
+            }
+            
+            // 4. 显示结果
+            const resultsCard = document.getElementById('results-card');
+            const riskLevelDisplay = document.getElementById('risk-level-display');
+            const interventionPlan = document.getElementById('intervention-plan');
+
+            riskLevelDisplay.textContent = `进展可能性：${riskLevel}`;
+            riskLevelDisplay.className = 'risk-level ' + riskClass;
+            interventionPlan.innerHTML = interventionHTML;
+
+            resultsCard.style.display = 'block';
+
+            // 滚动到结果区域，以便用户能看到
+            resultsCard.scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+
+</body>
+</html>
+
